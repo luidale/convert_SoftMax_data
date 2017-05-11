@@ -1,5 +1,0 @@
-pyinstaller.exe -F C:/Users/Hannes/Dropbox/proge/bioinf/Useful_scripts/plate_reader_data/last_version/convert_SoftMax_data3.py
-
-#without console window
-pyinstaller.exe -F -w C:/Users/Hannes/Dropbox/proge/bioinf/Useful_scripts/plate_reader_data/last_version/convert_SoftMax_data3.py
-

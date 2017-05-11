@@ -4,85 +4,12 @@ import os
 from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
-import convert
+import lib.convert
+import lib.write
 #import filedialog
 
 
-def write_output0(experiments,output_folder):
-    #wells: gr1-1,...,gr1-N,...,grN-1,...,grN-N
-    for experiment in experiments:
-        #Skipping dictionaries which are empty
-        file_name = "converted_"+input_location.split("/")[-1][:-4]+"_"+experiment.split("/")[-1]+"_"+output_types[0].split(" - ")[1]+".tsv"
-        print("\t\t\t"+file_name)
-        f_out_wells = open(os.path.join(output_folder,file_name),"w")
-        #header
-        f_out_wells.write("Time_point")
-        for group in sorted(experiments[experiment]["groups"]):
-            for well in experiments[experiment]["groups"][group]:
-               f_out_wells.write("\t"+group+"/"+well)
-        f_out_wells.write("\n")
-        #data
-        for i, timepoint in enumerate(experiments[experiment]["timepoints"]):
-            f_out_wells.write(timepoint)
-            for group in sorted(experiments[experiment]["groups"]):
-                well_number = len(experiments[experiment]["groups"][group])
-                for well in experiments[experiment]["groups"][group]:
-                    f_out_wells.write("\t"+experiments[experiment]["wells"][well][i])
-            f_out_wells.write("\n")
-        f_out_wells.close()
-
-def write_output1(experiments,output_folder):
-    #average: average_gr1,...,average_grN
-    for experiment in experiments:
-        #Skipping dictionaries which are empty
-        file_name = "converted_"+input_location.split("/")[-1]+"_"+experiment.split("/")[-1]+"_"+output_types[1].split(" - ")[1]+".tsv"
-        print("\t\t\t"+file_name)
-        f_out_average = open(os.path.join(output_folder,file_name),"w")
-        #header
-        f_out_average.write("Time_point")
-        for group in sorted(experiments[experiment]["groups"]):
-            f_out_average.write("\t"+group+"/Average")
-        f_out_average.write("\n")
-        #data
-        for i, timepoint in enumerate(experiments[experiment]["timepoints"]):
-            f_out_average.write(timepoint)
-            for group in sorted(experiments[experiment]["groups"]):
-                well_number = len(experiments[experiment]["groups"][group])
-                average = round(sum([float(experiments[experiment]["wells"][x][i]) for x in experiments[experiment]["groups"][group]])/well_number,3)
-                f_out_average.write("\t"+str(average))
-            f_out_average.write("\n")
-
-        f_out_average.close()
-
-
-def write_output2(experiments,output_folder):
-    #wells: gr1-1,...,gr1-N,average_gr1,space,...,grN-1,...,grN-N,average_grN,space,
-    for experiment in experiments:
-        #Skipping dictionaries which are empty
-        file_name = "converted_"+input_location.split("/")[-1]+"_"+experiment.split("/")[-1]+"_"+output_types[2].split(" - ")[1]+".tsv"
-        print("\t\t\t"+file_name)
-        f_out_wells = open(os.path.join(output_folder,file_name),"w")
-        #header
-        f_out_wells.write("Time_point")
-        for group in sorted(experiments[experiment]["groups"]):
-            for well in experiments[experiment]["groups"][group]:
-               f_out_wells.write("\t"+group+"/"+well)
-            f_out_wells.write("\t"+group+"/Average")
-            f_out_wells.write("\t")
-        f_out_wells.write("\n")
-        #data
-        for i, timepoint in enumerate(experiments[experiment]["timepoints"]):
-            f_out_wells.write(timepoint)
-            for group in sorted(experiments[experiment]["groups"]):
-                well_number = len(experiments[experiment]["groups"][group])
-                average = round(sum([float(experiments[experiment]["wells"][x][i]) for x in experiments[experiment]["groups"][group]])/well_number,3)
-                for well in experiments[experiment]["groups"][group]:
-                    f_out_wells.write("\t"+experiments[experiment]["wells"][well][i])
-                f_out_wells.write("\t"+str(average))
-                f_out_wells.write("\t")
-            f_out_wells.write("\n")
-
-        f_out_wells.close()       
+     
 
 def browse_input_file():
     #selects movie database and generates list of types, genres and movies
@@ -203,6 +130,8 @@ def change_output_filenames(arg):
             #label_output_filenames2 = Label(frame_output_type, text = "converted_"+input_location.split("/")[-1]+"_XXX_"+output_types[output_type_index].split(" - ")[1]+".tsv",bg="white")
         #label_output_filenames2.grid(row=8, column=0,sticky = W,padx=5)
         label_output_filenames2["text"]=output_filenames2
+    #change output type description
+    label_output_type_description_text["text"]=output_type_descriptions[output_types.index(var_output_type.get())]
 
 
 def browse_output_folder():
@@ -240,16 +169,16 @@ def convert_file():
     if input_type == 0:
         print("\tfile:")
         print("\t\t"+input_location)
-        experiments=convert.read_in_timepoints_one_file(input_location)
+        experiments=lib.convert.read_in_timepoints_one_file(input_location)
     if input_type == 1:
         print("\tfolder:")
         print("\t\t"+input_location)
         print("\t\tfile:")
-        experiments=convert.read_in_timepoints_one_folder(input_location)
+        experiments=lib.convert.read_in_timepoints_one_folder(input_location)
     if input_type == 2:
         print("\tfolder:")
         print("\t\t"+input_location)
-        experiments=convert.read_in_timepoints_one_folder_experiments_in_different_folders(input_location)
+        experiments=lib.convert.read_in_timepoints_one_folder_experiments_in_different_folders(input_location)
     #writing to the file
 
     output_type = output_types.index(var_output_type.get())
@@ -260,11 +189,11 @@ def convert_file():
     print("\t\t"+output_location)    
     print("\t\tfiles:")
     if output_type == 0:
-        write_output0(experiments,output_location)
+        lib.write.write_output0(experiments,input_types,input_location,var_input_type,output_types,output_location)
     if output_type == 1:
-        write_output1(experiments,output_location)
+        lib.write.write_output1(experiments,input_types,input_location,var_input_type,output_types,output_location)
     if output_type == 2:
-        write_output2(experiments,output_location)
+        lib.write.write_output2(experiments,input_types,input_location,var_input_type,output_types,output_location)
 
 def get_input_types(value):
     #to remove previous select_input button if exists
@@ -336,20 +265,38 @@ def test_input_file_column(file):
     else:
         return False
 
+def open_manual():
+    import webbrowser
+    url = "https://github.com/luidale/convert_SoftMax_data"
+    webbrowser.open(url, new=0, autoraise=True)
+
+def open_aboutDialog():
+    import lib.aboutDialog
+    lib.aboutDialog.AboutDialog(root,"About SoftMax data converter")
     
 ######GUI#######
 ###General
+
+    
 root = Tk()
-root.geometry("520x800")
-root.title("SoftMax data converter")
+root.geometry("530x800")
+root.title("convert_SoftMax_data")
+
+###Create menus
+menubar = Menu(root)
+helpmenu = Menu(menubar, tearoff=0)
+helpmenu.add_command(label="Manual", command=open_manual)
+helpmenu.add_command(label="About", command=open_aboutDialog)
+menubar.add_cascade(label="Help", menu=helpmenu)
+root.config(menu=menubar)
 
 ###Input data frame
 frame_input=Frame(root,bg="white")
 frame_input.place(x=20,y=20)
-label_input_data = Label(frame_input, text = "Input data", pady=10,font=(None,16, "bold"),bg="white")
+label_input_data = Label(frame_input, text = "Input data", pady=5,font=(None,16, "bold"),bg="white")
 label_input_data.grid(row=0, column=0,sticky = W,padx=5)
 frame_input.grid_rowconfigure(1, minsize=200)
-frame_input.grid_columnconfigure(1, minsize=360)
+frame_input.grid_columnconfigure(1, minsize=375)
 
 ##Input type frame
 frame_input_type=Frame(frame_input,bg="white")
@@ -357,7 +304,7 @@ frame_input_type.place(x=10,y=40)
 label_input_type = Label(frame_input_type,text = "Type",bg="white",font=(None,9, "bold"))
 label_input_type.grid(row=0, column=0,sticky = W,padx=5)
 #Input type optionmenu
-input_types =["1 - one file","2 - one folder","3 - several folders"]
+input_types =["1 - one file","2 - one folder","3 - one folder with subfolders"]
 var_input_type = StringVar()
 var_input_type.set(input_types[0])
 menu_input_type = OptionMenu(frame_input_type,var_input_type,*input_types,command = get_input_types)
@@ -369,23 +316,17 @@ label_input_type_description_label.grid(row=3, column=0,sticky = W,padx=5)
 input_type_descriptions =["Single \".txt\" file in a column format.\n\tTime points: separate plates \n\tConditions: separate experiments in a file",\
                           "Single or multiple \".txt\" files in a column format in one folder.\n\tTime points: separate files \n\tConditions: just single condition",\
                           "Single or multiple \".txt\" files in a column format in single or multiple subfolders.\n\tTime points: separate files in one subfolder\n\tConditions: subfolders"]
-
 label_input_type_description_text = Label(frame_input_type, text = input_type_descriptions[input_types.index(var_input_type.get())],bg="white",justify=LEFT)
 label_input_type_description_text.grid(row=4, column=0,sticky = W,padx=5)
-
 frame_input_type.grid_rowconfigure(5, minsize=10)
-
-
-
 #Selected file
-frame_input_type.grid_rowconfigure(3, minsize=20)
 label_input_selected = Label(frame_input_type, text = "Selected file:",bg="white",font=(None,9, "bold"))
 label_input_selected.grid(row=6, column=0,sticky = W,padx=5)
 frame_input.grid_rowconfigure(6, minsize=20)
 #Selected file text
 yscrollbar_location = Scrollbar(frame_input_type)
 yscrollbar_location.grid(row=7, column=1, sticky=N+S)
-input_location_box = Text(frame_input_type,width=53, height=2,yscrollcommand = yscrollbar_location.set)
+input_location_box = Text(frame_input_type,width=55, height=2,yscrollcommand = yscrollbar_location.set)
 yscrollbar_location.config(command=input_location_box.yview)
 input_location_box.grid(row=7, column=0, sticky=N+S+E+W,padx=5)
 
@@ -402,11 +343,11 @@ get_input_types(1)
 
 ###Output data frame
 frame_output=Frame(root,bg="white")
-frame_output.place(x=20,y=300)
-label_output_data = Label(frame_output, text = "Output data", pady=10,font=(None,16, "bold"),bg="white")
+frame_output.place(x=20,y=290)
+label_output_data = Label(frame_output, text = "Output data", pady=5,font=(None,16, "bold"),bg="white")
 label_output_data.grid(row=0, column=0,sticky = W,padx=5)
-frame_output.grid_rowconfigure(1, minsize=150)
-frame_output.grid_columnconfigure(1, minsize=342)
+frame_output.grid_rowconfigure(1, minsize=198)
+frame_output.grid_columnconfigure(1, minsize=356)
 
 ##output type frame
 frame_output_type=Frame(frame_output,bg="white")
@@ -419,24 +360,36 @@ var_output_type = StringVar()
 var_output_type.set(output_types[0])
 menu_output_type = OptionMenu(frame_output_type,var_output_type,*output_types,command=change_output_filenames)#,command = get_output_location)
 menu_output_type.grid(row=1, column=0,sticky = W,padx=5)
+frame_output_type.grid_rowconfigure(2, minsize=10)
+
+#Input type description
+label_output_type_description_label = Label(frame_output_type, text = "Type description:",bg="white",font=(None,9, "bold"))
+label_output_type_description_label.grid(row=3, column=0,sticky = W,padx=5)
+output_type_descriptions =["gr1-well-1,..,gr1-well-N,..,grN-well-1,..,grN-well-N",\
+                          "average_gr1,...,average_grN",\
+                          "gr1-well-1,..,gr1-well-N,average_gr1,space,..,grN-well-1,..,grN-well-N,average_grN"]
+
+label_output_type_description_text = Label(frame_output_type, text = output_type_descriptions[output_types.index(var_output_type.get())],bg="white",justify=LEFT)
+label_output_type_description_text.grid(row=4, column=0,sticky = W,padx=5)
+frame_output_type.grid_rowconfigure(5, minsize=10)
+
 #Selected file
-frame_output_type.grid_rowconfigure(2, minsize=20)
 label_output_selected = Label(frame_output_type, text = "Selected folder:",bg="white",font=(None,9, "bold"))
-label_output_selected.grid(row=3, column=0,sticky = W,padx=5)
+label_output_selected.grid(row=6, column=0,sticky = W,padx=5)
 frame_output.grid_rowconfigure(3, minsize=20)
 #Selected file text
 yscrollbar_text_output_location = Scrollbar(frame_output_type)
-yscrollbar_text_output_location.grid(row=4, column=1, sticky=N+S)
-text_output_location = Text(frame_output_type,width=53, height=2,yscrollcommand = yscrollbar_text_output_location.set)
+yscrollbar_text_output_location.grid(row=7, column=1, sticky=N+S)
+text_output_location = Text(frame_output_type,width=55, height=2,yscrollcommand = yscrollbar_text_output_location.set)
 yscrollbar_text_output_location.config(command=text_output_location.yview)
-text_output_location.grid(row=4, column=0, sticky=N+S+E+W,padx=5)
+text_output_location.grid(row=7, column=0, sticky=N+S+E+W,padx=5)
 frame_output.grid_rowconfigure(5, minsize=20)
 #File names
-frame_output_type.grid_rowconfigure(6, minsize=10)
+frame_output_type.grid_rowconfigure(8, minsize=10)
 label_output_selected = Label(frame_output_type, text = "Output files:",font=(None,9, "bold"),bg="white")
-label_output_selected.grid(row=7, column=0,sticky = W,padx=5)
+label_output_selected.grid(row=9, column=0,sticky = W,padx=5)
 label_output_filenames2 = Label(frame_output_type, text = "",bg="white")
-label_output_filenames2.grid(row=8, column=0,sticky = W,padx=5)
+label_output_filenames2.grid(row=10, column=0,sticky = W,padx=5)
 
 ##Location frame
 frame_output_location=Frame(frame_output,bg="white")
@@ -449,7 +402,7 @@ button_output_select.grid(row=1, column=0,sticky=W,padx=5,pady=2)
 
 ###Convert data frame
 frame_convert=Frame(root)
-frame_convert.place(x=180,y=560)
+frame_convert.place(x=180,y=572)
 button_convert = Button(frame_convert, text="Convert data",font=(None,16, "bold"), command=convert_file)
 button_convert.grid(row=0, column=0,sticky=W)
 
@@ -459,7 +412,7 @@ frame_run=Frame(root)
 frame_run.place(x=20,y=620)
 yscrollbar_text_run = Scrollbar(frame_run)
 yscrollbar_text_run.grid(row=1, column=1, sticky=N+S)
-text_run = Text(frame_run,width=57, height=10,yscrollcommand = yscrollbar_text_run.set)
+text_run = Text(frame_run,width=59, height=10,yscrollcommand = yscrollbar_text_run.set)
 yscrollbar_text_run.config(command=text_run.yview)
 text_run.grid(row=1, column=0, sticky=N+S+E+W,padx=1)
 
