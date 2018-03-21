@@ -6,14 +6,16 @@ GUI to convert SoftMax 96-well plate reader data to "TSV" format.
  
     or
 
-2) you can run also provided stand-alone executable whithout any prerequisites (single portable exe file which works out of the box).
+2) you can run also provided stand-alone executable without any prerequisites (single portable exe-file which works out of the box).
   
     Currently provided:
   
     [convert_SoftMax_data3_win8+.exe](https://github.com/luidale/convert_SoftMax_data/blob/master/convert_SoftMax_data3_win8+.exe)   - works at least in Windows 10 and Windows 8 (other OS-s not tested).
 
 ## Input
-**In general input has to be SoftMax output in column and txt format.**
+**Input has to be SoftMax output in column and txt format.**
+
+**Wells have to be in groups, non groupped wells are discarded**
 
 SoftMax output can be organized in different ways:
 
@@ -52,5 +54,9 @@ Data can be converted into different types:
 3) **Wells+Average**
 
     gr1-well-1,..,gr1-well-N,average_gr1,space,..,grN-well-1,..,grN-well-N,average_grN
+	
+4) **Average+SD**
+
+    average_gr1,...,average_grN,space,SD_gr1,...,SD_grN
 
 You can request for other type of outputs

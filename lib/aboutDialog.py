@@ -5,7 +5,7 @@
 from tkinter import *
 import os
 
-from idlelib import textView
+from idlelib import textview
 import lib.convert_SoftMax_data_ver
 
 class AboutDialog(Toplevel):
@@ -116,11 +116,11 @@ class AboutDialog(Toplevel):
     def display_printer_text(self, title, printer):
         printer._Printer__setup()
         text = '\n'.join(printer._Printer__lines)
-        textView.view_text(self, title, text)
+        textview.view_text(self, title, text)
 
     def display_file_text(self, title, filename, encoding=None):
         fn = os.path.join(os.path.abspath(os.path.dirname(__file__)), filename)
-        textView.view_file(self, title, fn, encoding)
+        textview.view_file(self, title, fn, encoding)
 
     def Ok(self, event=None):
         self.destroy()

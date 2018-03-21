@@ -1,6 +1,7 @@
 #Module contains al output writing scripts
 
 import os
+import statistics
 
 def write_output0(experiments,input_types,input_location,var_input_type,output_types,output_location):
     #wells: gr1-1,...,gr1-N,...,grN-1,...,grN-N
@@ -41,7 +42,11 @@ def write_output1(experiments,input_types,input_location,var_input_type,output_t
         #header
         f_out_average.write("Time_point")
         for group in sorted(experiments[experiment]["groups"]):
-            f_out_average.write("\t"+group+"/Average")
+            f_out_average.write("\tAverage")
+        f_out_average.write("\n")
+        f_out_average.write("Time_point")
+        for group in sorted(experiments[experiment]["groups"]):
+            f_out_average.write("\t"+group)
         f_out_average.write("\n")
         #data
         for i, timepoint in enumerate(experiments[experiment]["timepoints"]):
@@ -69,8 +74,15 @@ def write_output2(experiments,input_types,input_location,var_input_type,output_t
         f_out_wells.write("Time_point")
         for group in sorted(experiments[experiment]["groups"]):
             for well in experiments[experiment]["groups"][group]:
-               f_out_wells.write("\t"+group+"/"+well)
-            f_out_wells.write("\t"+group+"/Average")
+               f_out_wells.write("\t"+well)
+            f_out_wells.write("\tAverage")
+            f_out_wells.write("\t")
+        f_out_wells.write("\n")
+        f_out_wells.write("Time_point")
+        for group in sorted(experiments[experiment]["groups"]):
+            for well in experiments[experiment]["groups"][group]:
+               f_out_wells.write("\t"+group)
+            f_out_wells.write("\t"+group)
             f_out_wells.write("\t")
         f_out_wells.write("\n")
         #data
@@ -86,3 +98,44 @@ def write_output2(experiments,input_types,input_location,var_input_type,output_t
             f_out_wells.write("\n")
 
         f_out_wells.close()  
+
+def write_output3(experiments,input_types,input_location,var_input_type,output_types,output_location):
+    #average: average_gr1,...,average_grN,space,SD_gr1,...,SD_grN
+    for experiment in experiments:
+        #Skipping dictionaries which are empty
+        if input_types.index(var_input_type.get()) == 0: #removing file extention
+            file_name = "converted_"+input_location.split("/")[-1][:-4]+"_"+experiment.split("/")[-1]+"_"+output_types[3].split(" - ")[1]+".tsv"
+        else:
+            file_name = "converted_"+input_location.split("/")[-1]+"_"+experiment.split("/")[-1]+"_"+output_types[3].split(" - ")[1]+".tsv"
+        print("\t\t\t"+file_name)
+        f_out_average = open(os.path.join(output_location,file_name),"w")
+        #header
+        f_out_average.write("Time_point")
+        for group in sorted(experiments[experiment]["groups"]):
+            f_out_average.write("\tAverage")
+        f_out_average.write("\t")
+        for group in sorted(experiments[experiment]["groups"]):
+            f_out_average.write("\tSD")
+        f_out_average.write("\n")
+        f_out_average.write("Time_point")
+        for group in sorted(experiments[experiment]["groups"]):
+            f_out_average.write("\t"+group)
+        f_out_average.write("\t")
+        for group in sorted(experiments[experiment]["groups"]):
+            f_out_average.write("\t"+group)
+        f_out_average.write("\n")
+        #data
+        for i, timepoint in enumerate(experiments[experiment]["timepoints"]):
+            f_out_average.write(timepoint)
+            for group in sorted(experiments[experiment]["groups"]):
+                well_number = len(experiments[experiment]["groups"][group])
+                average = round(statistics.mean([float(experiments[experiment]["wells"][x][i]) for x in experiments[experiment]["groups"][group]]),3)
+                f_out_average.write("\t"+str(average))
+            f_out_average.write("\t")
+            for group in sorted(experiments[experiment]["groups"]):
+                well_number = len(experiments[experiment]["groups"][group])
+                stdev = round(statistics.pstdev([float(experiments[experiment]["wells"][x][i]) for x in experiments[experiment]["groups"][group]]),5)
+                f_out_average.write("\t"+str(stdev))
+            f_out_average.write("\n")
+
+        f_out_average.close()
