@@ -1,7 +1,7 @@
 # convert_SoftMax_data
 GUI to convert SoftMax 96-well plate reader data to "TSV" format.
 
-![Screen_shot](screen_shot.GIF)
+![Screen_shot](screenshot.GIF)
 
 ## Requirements
 1) Python 3+
