@@ -1,6 +1,8 @@
 # convert_SoftMax_data
 GUI to convert SoftMax 96-well plate reader data to "TSV" format.
 
+![Screen_shot](screen_shot.GIF)
+
 ## Requirements
 1) Python 3+
  
@@ -60,3 +62,14 @@ Data can be converted into different types:
     average_gr1,...,average_grN,space,SD_gr1,...,SD_grN
 
 You can request for other type of outputs
+
+
+
+Licence
+-------
+[GNU General Public License v3.0 ](https://github.com/luidale/convert_SoftMax_data/blob/master/LICENSE)
+
+Authors
+-------
+[convert_SoftMax_data](https://github.com/luidale/convert_SoftMax_data) was written by [Hannes Luidalepp](luidale@gmail.com)
+
